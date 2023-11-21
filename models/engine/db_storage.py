@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-"""
-DataBase Storage
-"""
+""" DataBase Storage """
 
 from models.city import City
 from models.place import Place
@@ -15,6 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm import scoped_session
 from os import getenv
 
+
 dict_class = {"Amenity": Amenity,
               "City": City,
               "Place": Place,
@@ -24,9 +23,7 @@ dict_class = {"Amenity": Amenity,
 
 
 class DBStorage:
-    """
-    DataBase Storage
-    """
+    """ DataBase Storage """
     __engine = None
     __session = None
 
@@ -57,28 +54,20 @@ class DBStorage:
         return dicto
 
     def new(self, obj):
-        """
-        add obj to current database session
-        """
+        """ add obj to current database session """
         self.__session.add(obj)
 
     def save(self):
-        """
-        commit all changes current database session
-        """
+        """ commit all changes current database session """
         self.__session.commit()
 
     def delete(self, obj=None):
-        """
-        delete from current database session obj if not None
-        """
+        """ delete from current database session obj if not None """
         if obj is not None:
             self.__session.delete(obj)
 
     def reload(self):
-        """
-        create all tables in database and initialize session
-        """
+        """ create all tables in database and initialize session """
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
@@ -86,7 +75,5 @@ class DBStorage:
         self.__session = Session()
 
     def close(self):
-        """
-        close
-        """
+        """ close """
         self.__session.close()
