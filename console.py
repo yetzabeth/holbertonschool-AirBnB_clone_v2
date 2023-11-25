@@ -10,10 +10,7 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
-import shlex
 
-classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
-           "Place": Place, "Review": Review, "State": State, "User": User}
 
 class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
@@ -36,7 +33,7 @@ class HBNBCommand(cmd.Cmd):
     def preloop(self):
         """Prints if isatty is false"""
         if not sys.__stdin__.isatty():
-            print('(hbnb)', end="")
+            print('(hbnb)')
 
     def precmd(self, line):
         """Reformat command line for advanced command syntax.
@@ -118,34 +115,21 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-        try:
-            if not args:
-                raise SyntaxError()
-            mylist = args.split(" ")
-            prms = {}
-            if len(mylist) > 1:
-                for i in range(1, len(mylist)):
-                    if len(mylist[i].split("=")) == 2:
-                        key = mylist[i].split("=")[0]
-                        val = mylist[i].split("=")[1].replace("_", " ")
-                        val = val.strip('"')
-                        if val.isnumeric():
-                            val = int(val)
-                        else:
-                            try:
-                                float(val)
-                            except Exception:
-                                pass
-                        prms[key] = val
-            obj = eval("{}()".format(mylist[0]))
-            for key, v in prms.items():
-                setattr(obj, key, v)
-            obj.save()
-            print("{}".format(obj.id))
-        except SyntaxError:
-            pass
-        except NameError:
-            pass
+        if not args:
+            raise SyntaxError("Error of syntax")
+        first_split = args.split(' ')
+        kwargs = {}
+        for i in range(1, len(first_split)):
+            key, value = tuple(first_split[i].split('='))
+            if value[0] == '"':
+                value = value.strip('"').replace('_', ' ')
+            kwargs[key] = value
+        if kwargs == {}:
+            new_instance = eval(first_split[0])()
+        else:
+            new_instance = eval(first_split[0])(**kwargs)
+        print(new_instance.id)
+        new_instance.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -220,20 +204,22 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
-        a = shlex.split(args)
-        objlist = []
-        if len(a) == 0:
-            objdict = storage.all()
-        elif a[0] in classes:
-            objdict = storage.all(classes[a[0]])
+        print_list = []
+
+        if args:
+            args = args.split(' ')[0]  # remove possible trailing args
+            if args not in HBNBCommand.classes:
+                print("** class doesn't exist **")
+                return
+            for k, v in storage.all().items():
+                if k.split('.')[0] == args:
+                    print_list.append(str(v))
         else:
-            print("** class doesn't exist **")
-            return False
-        for k in objdict:
-            objlist.append(str(objdict[k]))
-        print("[", end="")
-        print(", ".join(objlist), end="")
-        print("]")     
+            for k, v in storage.all().items():
+                print_list.append(str(v))
+
+        print(print_list)
+        return print_list
 
     def help_all(self):
         """ Help information for the all command """
