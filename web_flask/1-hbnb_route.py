@@ -12,8 +12,8 @@ def home():
     return 'Hello HBNB'
 
 
-@app.route('/HBNB')
-def HBNB():
+@app.route('/hbnb')
+def hbnb():
     """ second  end point """
     return 'HBNB'
 
