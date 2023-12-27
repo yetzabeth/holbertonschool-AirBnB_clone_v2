@@ -20,7 +20,7 @@ class State(BaseModel, Base):
                               cascade="all, delete-orphan")
 
     # For FileStorage
-    if getenv('HBNB_TYPE_STORAGE') == 'file':
+    if getenv('HBNB_TYPE_STORAGE') != 'db':
         @property
         def cities(self):
             """Getter attribute that returns the list of City instances
