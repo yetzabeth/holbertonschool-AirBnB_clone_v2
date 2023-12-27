@@ -4,6 +4,7 @@ from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship
 from os import getenv
+import models
 from models.city import City
 
 
@@ -16,7 +17,7 @@ class State(BaseModel, Base):
     # For DBStorage
     if getenv('HBNB_TYPE_STORAGE') == 'db':
         cities = relationship("City", backref="state",
-    cascade="all, delete-orphan")
+                              cascade="all, delete-orphan")
 
     # For FileStorage
     if getenv('HBNB_TYPE_STORAGE') == 'file':
@@ -25,7 +26,7 @@ class State(BaseModel, Base):
             """Getter attribute that returns the list of City instances
             with state_id equals to the current State.id"""
             cities_list = []
-            for city_id, city in models.storage.all("City").items():
+            for city_id, city in models.storage.all(City).items():
                 if city.state_id == self.id:
                     cities_list.append(city)
             return cities_list
